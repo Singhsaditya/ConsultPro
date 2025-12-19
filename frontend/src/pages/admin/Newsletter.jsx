@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Mail } from 'lucide-react';
 import API_BASE from '../../api';
 
 function Newsletter() {
   const [subscribers, setSubscribers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // FETCH SUBSCRIBERS
+  // FETCH SUBSCRIBERS FROM BACKEND
   useEffect(() => {
     fetch(`${API_BASE}/subscribers`)
-      .then(res => res.json())
-      .then(data => setSubscribers(data));
+      .then((res) => res.json())
+      .then((data) => {
+        setSubscribers(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   return (
@@ -19,65 +23,56 @@ function Newsletter() {
           Newsletter Subscribers
         </h1>
         <p className="text-gray-600 mt-2">
-          View all newsletter subscriptions
+          Emails collected from the landing page newsletter form
         </p>
       </div>
 
-      {/* SUMMARY CARD */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-8 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-600">Total Subscribers</p>
-          <p className="text-3xl font-bold text-gray-800">
-            {subscribers.length}
-          </p>
-        </div>
-        <div className="bg-blue-600 p-4 rounded-lg">
-          <Mail className="w-8 h-8 text-white" />
-        </div>
-      </div>
+      {loading && (
+        <p className="text-gray-500">Loading subscribers...</p>
+      )}
 
-      {/* SUBSCRIBERS TABLE */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-800">
-            Subscriber List
-          </h2>
-        </div>
+      {!loading && subscribers.length === 0 && (
+        <p className="text-gray-500">No subscribers yet.</p>
+      )}
 
-        <div className="overflow-x-auto">
+      {!loading && subscribers.length > 0 && (
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left font-semibold text-gray-700">
-                  Email Address
+                <th className="text-left py-4 px-6 font-semibold text-gray-700">
+                  #
                 </th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-700">
+                <th className="text-left py-4 px-6 font-semibold text-gray-700">
+                  Email
+                </th>
+                <th className="text-left py-4 px-6 font-semibold text-gray-700">
                   Subscribed On
                 </th>
               </tr>
             </thead>
+
             <tbody>
-              {subscribers.map((subscriber, index) => (
+              {subscribers.map((sub, index) => (
                 <tr
-                  key={subscriber._id}
-                  className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                  key={sub._id}
+                  className="border-b hover:bg-gray-50 transition"
                 >
-                  <td className="px-6 py-4">{subscriber.email}</td>
-                  <td className="px-6 py-4 text-gray-600">
-                    {new Date(subscriber.createdAt).toLocaleDateString()}
+                  <td className="py-4 px-6 text-gray-600">
+                    {index + 1}
+                  </td>
+                  <td className="py-4 px-6 text-gray-800">
+                    {sub.email}
+                  </td>
+                  <td className="py-4 px-6 text-gray-600 text-sm">
+                    {new Date(sub.subscribedAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          {subscribers.length === 0 && (
-            <div className="text-center py-10 text-gray-500">
-              No subscribers yet.
-            </div>
-          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
