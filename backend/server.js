@@ -1,37 +1,37 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/db.js';
+
+import projectRoutes from './routes/projects.js';
+import clientRoutes from './routes/clients.js';
+import contactRoutes from './routes/contacts.js';
+import subscriberRoutes from './routes/subscribers.js';
 
 dotenv.config();
 
 const app = express();
 
-//  CONNECT DATABASE
-connectDB();
-
-// middleware
 app.use(cors());
 app.use(express.json());
 
-import projectRoutes from './routes/projectRoutes.js';
-import clientRoutes from './routes/clientRoutes.js';
-import contactRoutes from './routes/contactRoutes.js';
-import subscriberRoutes from './routes/subscriberRoutes.js';
+// MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB error:', err));
 
-app.use('/api/projects', projectRoutes);
-app.use('/api/clients', clientRoutes);
-app.use('/api/contacts', contactRoutes);
-app.use('/api/subscribers', subscriberRoutes);
+// Routes
+app.use('/projects', projectRoutes);
+app.use('/clients', clientRoutes);
+app.use('/contacts', contactRoutes);
+app.use('/subscribers', subscriberRoutes);
 
-
-// test route
 app.get('/', (req, res) => {
-  res.send('ConsultPro Backend is running 🚀');
+  res.send('ConsultPro Backend Running');
 });
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

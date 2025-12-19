@@ -1,14 +1,24 @@
 import express from 'express';
-import {
-  getClients,
-  createClient,
-  deleteClient,
-} from '../controllers/clientController.js';
+import Client from '../models/Client.js';
 
 const router = express.Router();
 
-router.get('/', getClients);
-router.post('/', createClient);
-router.delete('/:id', deleteClient);
+// GET clients
+router.get('/', async (req, res) => {
+  const clients = await Client.find();
+  res.json(clients);
+});
+
+// ADD client
+router.post('/', async (req, res) => {
+  const client = await Client.create(req.body);
+  res.json(client);
+});
+
+// DELETE client
+router.delete('/:id', async (req, res) => {
+  await Client.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
+});
 
 export default router;

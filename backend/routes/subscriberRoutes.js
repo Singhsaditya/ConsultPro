@@ -1,12 +1,18 @@
 import express from 'express';
-import {
-  getSubscribers,
-  addSubscriber,
-} from '../controllers/subscriberController.js';
+import Subscriber from '../models/Subscriber.js';
 
 const router = express.Router();
 
-router.get('/', getSubscribers);
-router.post('/', addSubscriber);
+// GET subscribers
+router.get('/', async (req, res) => {
+  const subscribers = await Subscriber.find();
+  res.json(subscribers);
+});
+
+// ADD subscriber
+router.post('/', async (req, res) => {
+  const subscriber = await Subscriber.create(req.body);
+  res.json(subscriber);
+});
 
 export default router;
