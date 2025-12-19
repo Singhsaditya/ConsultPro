@@ -50,7 +50,7 @@ useEffect(() => {
 
     setFormData({ name: "", description: "", image: "" });
 
-    // 🔥 IMPORTANT: refetch projects from DB
+    //  IMPORTANT: refetch projects from DB
     fetchProjects();
 
     alert("Project added successfully");
