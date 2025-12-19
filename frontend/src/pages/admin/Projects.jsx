@@ -11,26 +11,55 @@ function Projects() {
   });
 
   // FETCH PROJECTS
-  useEffect(() => {
-    fetch(`${API_BASE}/projects`)
-      .then(res => res.json())
-      .then(data => setProjects(data));
-  }, []);
+  
+  const fetchProjects = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/projects`);
+    const data = await res.json();
+    setProjects(data);
+  } catch (error) {
+    console.error("Failed to fetch projects");
+  }
+};
 
+useEffect(() => {
+  fetchProjects();
+}, []);
+ 
   // ADD PROJECT
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const res = await fetch(`${API_BASE}/projects`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+  if (!formData.name || !formData.description || !formData.image) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/projects`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(formData),
     });
 
-    const newProject = await res.json();
-    setProjects([newProject, ...projects]);
-    setFormData({ name: '', description: '', image: '' });
-  };
+    if (!res.ok) {
+      throw new Error("Failed to add project");
+    }
+
+    setFormData({ name: "", description: "", image: "" });
+
+    // 🔥 IMPORTANT: refetch projects from DB
+    fetchProjects();
+
+    alert("Project added successfully");
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
+  }
+};
+
 
   // DELETE PROJECT
   const handleDelete = async (id) => {
