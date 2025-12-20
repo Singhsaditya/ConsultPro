@@ -5,20 +5,32 @@ const router = express.Router();
 
 // GET all projects
 router.get('/', async (req, res) => {
-  const projects = await Project.find();
-  res.json(projects);
+  try {
+    const projects = await Project.find();
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ADD project
 router.post('/', async (req, res) => {
-  const project = await Project.create(req.body);
-  res.json(project);
+  try {
+    const project = await Project.create(req.body);
+    res.json(project);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // DELETE project
 router.delete('/:id', async (req, res) => {
-  await Project.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+  try {
+    await Project.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 export default router;
