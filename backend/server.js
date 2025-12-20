@@ -21,19 +21,26 @@ app.get('/', (req, res) => {
   res.send('ConsultPro backend is running');
 });
 
-// ✅ IMPORTANT: ROUTES (NO /api PREFIX)
+// Routes
 app.use('/projects', projectRoutes);
 app.use('/clients', clientRoutes);
 app.use('/contacts', contactRoutes);
 app.use('/subscribers', subscriberRoutes);
 
-// MongoDB connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error('MongoDB connection failed:', err.message));
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB connected');
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('MongoDB connection failed:', err.message);
+    process.exit(1);
+  }
+};
+
+startServer();
